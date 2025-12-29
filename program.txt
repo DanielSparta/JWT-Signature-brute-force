@@ -1,0 +1,7 @@
+import hmac, hashlib, base64
+header_payload = "header.payload"
+target = "signature"
+for secret in open("tokens.txt", "rb"): # Reading as bytes handles any character
+    secret_bytes = secret.strip()
+    sig = base64.urlsafe_b64encode(hmac.new(secret_bytes, header_payload.encode(), hashlib.sha256).digest()).decode().replace("=", "")
+    if sig == target: print(f"Match found: {secret_bytes}")
